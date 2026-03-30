@@ -146,3 +146,4 @@ function setupMain(){
         
         console.clear();
     });
+})();
