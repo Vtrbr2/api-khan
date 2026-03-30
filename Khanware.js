@@ -1,13 +1,9 @@
+javascript:(function(){
+    
 const ver = "V3.9.7";
 let isDev = false;
 
-let repoPath;
-
-const availableCDNs = [
-    `https://raw.githubusercontent.com/Niximkk/Khanware/refs/heads/${isDev ? "dev" : "main"}/`,
-    `https://cdn.jsdelivr.net/gh/niximkk/khanware@${isDev ? "dev" : "master"}/`,
-    `https://cdn.statically.io/gh/Niximkk/Khanware/refs/heads/${isDev ? "dev" : "main"}/`
-];
+const repoPath = `https://cdn.jsdelivr.net/gh/Vtrbr2/api-khan@main/`;
 
 let device = {
     mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone|Mobile|Tablet|Kindle|Silk|PlayBook|BB10/i.test(navigator.userAgent),
@@ -73,7 +69,7 @@ const plppdo = new EventEmitter();
 new MutationObserver((mutationsList) => { for (let mutation of mutationsList) if (mutation.type === 'childList') plppdo.emit('domChanged'); }).observe(document.body, { childList: true, subtree: true });
 
 /* Misc Functions */
-window.debug = function(text) { console.log(text); /* Hi, im just a "this exists", i am soon going to be replaced with some bullshit from /visuals/devTab.js. */}
+window.debug = function(text) { console.log(text); }
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const playAudio = url => { const audio = new Audio(url); audio.play(); debug(`🔊 Playing audio from ${url}`); };
 const findAndClickBySelector = selector => { const element = document.querySelector(selector); if (element) { element.click(); debug(`⭕ Pressing ${selector}`); } };
@@ -90,22 +86,6 @@ function createTab(name, href = '#', id) {
     const li = document.createElement('li'); 
     li.innerHTML = `<a class="_sdyfgnu" id="${id}" href="${href}" target="_blank"><span class="_i7xxeac">${name}</span></a>`; 
     return li; 
-}
-
-/* Repo Fallback */
-async function initializeRepoPath() {
-    for (const cdn of availableCDNs) {
-        try {
-            const response = await fetch(cdn + 'Khanware.js', { method: 'HEAD' });
-            if (response.ok) { 
-                repoPath = cdn;
-                try { translations = await (await fetch(repoPath+'utils/langs.json')).json();
-                } catch(e) { console.warn('How did you even break this? Failed to load translations.', e); };
-                return; 
-            }
-        } catch {}
-    }
-    console.log('The entire internet is down for some reason. God help us all...');
 }
 
 /* Visual Functions */
@@ -135,8 +115,12 @@ function setupMain(){
 /* Inject */
 (async function boot() {
     showSplashScreen();
-    
-    await initializeRepoPath();
+
+    try {
+        translations = await (await fetch(repoPath+'utils/langs.json')).json();
+    } catch(e) {
+        console.warn('Failed to load translations.', e);
+    }
 
     loadScript('https://cdn.jsdelivr.net/gh/adryd325/oneko.js@master/oneko.js', 'onekoJs').then(() => { onekoEl = document.getElementById('oneko'); onekoEl.style.backgroundImage = "url('https://cdn.jsdelivr.net/gh/adryd325/oneko.js@master/oneko.gif')"; onekoEl.style.display = "none"; });
     loadScript('https://cdn.jsdelivr.net/npm/darkreader@latest/darkreader.min.js', 'darkReaderPlugin').then(()=>{ DarkReader.setFetchMethod(window.fetch); DarkReader.enable(); })
