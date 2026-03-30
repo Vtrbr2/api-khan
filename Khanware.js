@@ -1,5 +1,3 @@
-javascript:(function(){
-    
 const ver = "V3.9.7";
 let isDev = false;
 
@@ -148,4 +146,3 @@ function setupMain(){
         
         console.clear();
     });
-})();
